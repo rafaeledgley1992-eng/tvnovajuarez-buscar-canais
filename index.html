@@ -13,19 +13,13 @@
     overflow:hidden; height:100vh; width:100vw;
   }
 
-  /* PLAYER */
+  /* PLAYER — sempre preenche a tela toda */
   #videoContainer { position:fixed; inset:0; background:#000; overflow:hidden; }
   #video {
     width:100%; height:100%; background:#000; display:block;
-    object-fit:contain; transition: object-fit 0.3s ease, transform 0.4s ease;
+    object-fit:contain;
+    transition: transform 0.4s ease;
   }
-
-  /* FORMATOS DE TELA (sem redes sociais) */
-  #video.formato-16-9  { object-fit: contain; }
-  #video.formato-4-3   { object-fit: contain; }
-  #video.formato-cinema { object-fit: cover; }
-  #video.formato-preencher { object-fit: fill; }
-  #video.formato-zoom  { object-fit: cover; }
 
   /* SPLASH */
   #splash {
@@ -40,7 +34,7 @@
   #splash .creditos { font-size:13px; line-height:1.8; color:#a0b8d0; max-width:420px; }
   #splash .creditos b { color:#fff; }
 
-  /* HEADER INFO */
+  /* HEADER */
   #headerInfo {
     position:fixed; top:0; left:0; right:0; z-index:40;
     display:flex; justify-content:space-between; align-items:flex-start;
@@ -118,7 +112,7 @@
     border-radius:50px; opacity:0; pointer-events:none;
     transition: opacity 0.35s ease;
     border: 1px solid rgba(0,180,255,0.15);
-    max-width:calc(100vw - 180px);
+    max-width:calc(100vw - 160px);
     flex-wrap:nowrap; justify-content:center;
   }
   #controles.visivel { opacity:1; pointer-events:auto; }
@@ -134,25 +128,6 @@
   #controles button.destaque:hover { background:#ff5050; }
   #controles button.girarAtivo { background:#00ff88; color:#000; }
   #controles button.girarAtivo:hover { background:#00cc6a; }
-
-  /* SELETOR DE FORMATO */
-  #seletorFormato {
-    position:fixed; bottom:22px; left:14px; z-index:61;
-    display:flex; flex-direction:column; gap:5px;
-    opacity:0; pointer-events:none;
-    transition: opacity 0.35s ease;
-    max-width:120px;
-  }
-  #seletorFormato.visivel { opacity:1; pointer-events:auto; }
-  #seletorFormato button {
-    background:rgba(20,30,45,0.92); color:#c0d0e0;
-    border:1px solid rgba(0,180,255,0.25);
-    padding:6px 10px; border-radius:7px;
-    font-size:10px; cursor:pointer; text-align:left;
-    transition: all 0.15s;
-  }
-  #seletorFormato button:hover { background:rgba(0,180,255,0.2); color:#fff; }
-  #seletorFormato button.ativo { background:#00b4ff; color:#000; border-color:#00b4ff; }
 
   /* VOLUME */
   #volumeBox {
@@ -185,7 +160,7 @@
     background:#00b4ff; cursor:pointer; border:none;
   }
 
-  /* BOTÃO FLUTUANTE ☰ */
+  /* BOTÃO ☰ */
   #btnMostrar {
     position:fixed; bottom:22px; right:14px; z-index:55;
     background:rgba(0,180,255,0.15); color:#00b4ff;
@@ -225,15 +200,12 @@
   /* AJUSTES TELA CHEIA */
   body.telaCheia #controles { bottom:20px; }
   body.telaCheia #barraCanais { bottom:86px; }
-  body.telaCheia #seletorFormato { bottom:20px; left:14px; }
   body.telaCheia #volumeBox { bottom:76px; right:14px; }
   body.telaCheia #btnMostrar { bottom:20px; right:14px; }
 
   @media (max-width: 600px) {
-    #controles { max-width:calc(100vw - 160px); gap:7px; padding:8px 12px; }
+    #controles { max-width:calc(100vw - 140px); gap:7px; padding:8px 12px; }
     #controles button { width:40px; height:40px; font-size:15px; }
-    #seletorFormato { max-width:100px; }
-    #seletorFormato button { font-size:9px; padding:5px 8px; }
     #volumeBox { padding:6px 10px; }
     #volumeSlider { width:60px; }
   }
@@ -269,15 +241,6 @@
 
 <div id="barraCanais"></div>
 
-<!-- SELETOR DE FORMATO (sem redes sociais) -->
-<div id="seletorFormato">
-  <button data-formato="16-9" class="ativo">📺 16:9</button>
-  <button data-formato="4-3">📻 4:3</button>
-  <button data-formato="cinema">🎬 Cinema</button>
-  <button data-formato="preencher">🖥️ Preencher</button>
-  <button data-formato="zoom">🔍 Zoom</button>
-</div>
-
 <div id="volumeBox">
   <span class="iconeVolume" id="iconeVolume">🔊</span>
   <input type="range" id="volumeSlider" min="0" max="100" value="100">
@@ -285,14 +248,14 @@
 
 <button id="btnMostrar" title="Mostrar controles">☰</button>
 
-<!-- BARRA PRINCIPAL: ordem ⏮ ⏭ 🔃 ⏻ ⛶ 🔄 -->
+<!-- BARRA: ⏮ ⏭ 🔃 ⏻ ⛶ 🔄 -->
 <div id="controles">
   <button id="btnAnterior" title="Canal anterior">⏮</button>
   <button id="btnProximo" title="Próximo canal">⏭</button>
   <button id="btnRecarregar" title="Recarregar canal" class="destaque">🔃</button>
   <button id="btnReiniciarApp" title="Reiniciar aplicativo">⏻</button>
-  <button id="btnFullscreen" title="Tela cheia (paisagem)">⛶</button>
-  <button id="btnGirar" title="Girar tela para horizontal">🔄</button>
+  <button id="btnFullscreen" title="Tela cheia">⛶</button>
+  <button id="btnGirar" title="Girar tela">🔄</button>
 </div>
 
 <div id="reconectando">
@@ -344,7 +307,6 @@ const controles = document.getElementById("controles");
 const headerInfo = document.getElementById("headerInfo");
 const botoesBusca = document.getElementById("botoesBusca");
 const barraCanais = document.getElementById("barraCanais");
-const seletorFormato = document.getElementById("seletorFormato");
 const volumeBox = document.getElementById("volumeBox");
 const overlayReconectando = document.getElementById("reconectando");
 
@@ -385,33 +347,6 @@ iconeVolume.addEventListener("click", () => {
     atualizarIconeVolume(0);
   }
 });
-
-/* ============================================================
-   FORMATOS DE TELA (sem redes sociais)
-   ============================================================ */
-let formatoAtual = "16-9";
-document.querySelectorAll("#seletorFormato button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll("#seletorFormato button").forEach(b => b.classList.remove("ativo"));
-    btn.classList.add("ativo");
-    formatoAtual = btn.dataset.formato;
-    aplicarFormato(formatoAtual);
-    mostrarToast("Formato: " + btn.textContent.trim());
-    mostrarControles();
-  });
-});
-
-function aplicarFormato(f) {
-  // Preserva a rotação se estiver girado
-  const girando = video.style.transform.includes("rotate");
-  video.className = "";
-  video.classList.add("formato-" + f);
-  if (!girando) {
-    video.style.transform = (f === "zoom") ? "scale(1.15)" : "none";
-  } else {
-    video.style.transform = "rotate(90deg) scale(1.8)";
-  }
-}
 
 /* ============================================================
    MONTAR LISTA
@@ -475,7 +410,6 @@ function mostrarControles() {
   controles.classList.add("visivel");
   headerInfo.classList.add("visivel");
   botoesBusca.classList.add("visivel");
-  seletorFormato.classList.add("visivel");
   volumeBox.classList.add("visivel");
   barraCanais.classList.add("visivel");
 
@@ -484,7 +418,6 @@ function mostrarControles() {
     controles.classList.remove("visivel");
     headerInfo.classList.remove("visivel");
     botoesBusca.classList.remove("visivel");
-    seletorFormato.classList.remove("visivel");
     volumeBox.classList.remove("visivel");
     barraCanais.classList.remove("visivel");
   }, 6000);
@@ -645,29 +578,23 @@ document.getElementById("btnReiniciarApp").addEventListener("click", () => {
 });
 
 /* ============================================================
-   TELA CHEIA — já entra tentando paisagem
+   TELA CHEIA
    ============================================================ */
 document.getElementById("btnFullscreen").addEventListener("click", async () => {
   try {
     if (!document.fullscreenElement) {
       await document.documentElement.requestFullscreen?.();
       document.body.classList.add("telaCheia");
-
-      // Tenta travar em paisagem (funciona em muitos navegadores móveis)
       try {
         if (screen.orientation && screen.orientation.lock) {
           await screen.orientation.lock("landscape");
         }
-      } catch (e) {
-        // Se não suportar, segue sem travar (o botão girar resolve)
-      }
+      } catch (e) {}
     } else {
       document.exitFullscreen?.();
       document.body.classList.remove("telaCheia");
       try {
-        if (screen.orientation && screen.orientation.unlock) {
-          screen.orientation.unlock();
-        }
+        if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
       } catch (e) {}
     }
   } catch (e) {}
@@ -683,40 +610,47 @@ document.addEventListener("fullscreenchange", () => {
 });
 
 /* ============================================================
-   GIRAR TELA — vira para horizontal
+   GIRAR TELA — 3 estados:
+   normal → horizontal (90°) → horizontal invertido (180°) → normal
    ============================================================ */
-let rotacionado = false;
+let estadoRotacao = 0; // 0 = normal, 1 = horizontal (90°), 2 = horizontal invertido (-90°/270°)
 const btnGirar = document.getElementById("btnGirar");
 
 btnGirar.addEventListener("click", async () => {
-  rotacionado = !rotacionado;
+  estadoRotacao = (estadoRotacao + 1) % 3;
 
-  if (rotacionado) {
-    // Aplica rotação
+  if (estadoRotacao === 0) {
+    // Normal (vertical)
+    video.style.transform = "none";
+    btnGirar.classList.remove("girarAtivo");
+    try {
+      if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+    } catch (e) {}
+    mostrarToast("📱 Tela vertical");
+  }
+  else if (estadoRotacao === 1) {
+    // Horizontal (girado 90°)
     video.style.transform = "rotate(90deg) scale(1.8)";
     btnGirar.classList.add("girarAtivo");
-
-    // Tenta travar em paisagem também
     try {
       if (screen.orientation && screen.orientation.lock) {
         await screen.orientation.lock("landscape");
       }
     } catch (e) {}
-
     mostrarToast("📺 Tela horizontal");
-  } else {
-    // Volta ao normal
-    video.style.transform = (formatoAtual === "zoom") ? "scale(1.15)" : "none";
-    btnGirar.classList.remove("girarAtivo");
-
+  }
+  else if (estadoRotacao === 2) {
+    // Horizontal invertido (girado 270°/ -90°) — vira para o outro lado
+    video.style.transform = "rotate(-90deg) scale(1.8)";
+    btnGirar.classList.add("girarAtivo");
     try {
-      if (screen.orientation && screen.orientation.unlock) {
-        screen.orientation.unlock();
+      if (screen.orientation && screen.orientation.lock) {
+        await screen.orientation.lock("landscape");
       }
     } catch (e) {}
-
-    mostrarToast("📱 Tela normal");
+    mostrarToast("📺 Tela horizontal (invertida)");
   }
+
   mostrarControles();
 });
 
@@ -839,14 +773,14 @@ document.getElementById("btnAnatel").addEventListener("click", buscarAnatel);
 document.getElementById("btnInternet").addEventListener("click", buscarInternet);
 
 /* ============================================================
-   INICIALIZAÇÃO
+   INICIALIZAÇÃO — já recarrega o canal automaticamente
    ============================================================ */
 window.addEventListener("load", () => {
+  // Monta a lista e já toca o primeiro canal (TV Nova Juarez) automaticamente
   listaCanais = montarListaFinal(canaisBaseInicial);
   indiceAtual = 0;
-  aplicarFormato("16-9");
   atualizarIconeVolume(1);
-  tocarCanal(0);
+  tocarCanal(0); // <- recarrega o canal ao abrir
   atualizarContador();
   renderizarBarraCanais();
 
@@ -857,6 +791,13 @@ window.addEventListener("load", () => {
   }, 3500);
 
   setTimeout(mostrarControles, 400);
+});
+
+/* Se o app voltar do background, recarrega o canal atual */
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && listaCanais.length > 0) {
+    tocarCanal(indiceAtual, 0);
+  }
 });
 
 window.addEventListener("beforeunload", () => destruirPlayer());
