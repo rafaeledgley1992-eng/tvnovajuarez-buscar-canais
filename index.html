@@ -14,8 +14,19 @@
   }
 
   /* PLAYER */
-  #videoContainer { position:fixed; inset:0; background:#000; }
-  #video { width:100%; height:100%; object-fit:contain; background:#000; display:block; }
+  #videoContainer { position:fixed; inset:0; background:#000; overflow:hidden; }
+  #video {
+    width:100%; height:100%; background:#000; display:block;
+    object-fit:contain; transition: object-fit 0.3s ease;
+  }
+
+  /* FORMATOS DE TELA */
+  #video.formato-16-9  { object-fit: contain; }
+  #video.formato-4-3   { object-fit: contain; }
+  #video.formato-vertical { object-fit: contain; }
+  #video.formato-cinema { object-fit: cover; }
+  #video.formato-preencher { object-fit: fill; }
+  #video.formato-zoom  { object-fit: cover; transform: scale(1.15); }
 
   /* SPLASH */
   #splash {
@@ -76,11 +87,48 @@
   #botoesBusca button:hover { background:rgba(0,180,255,0.2); color:#fff; border-color:#00b4ff; }
   #botoesBusca button.ativo { background:#00b4ff; color:#000; border-color:#00b4ff; }
 
+  /* BARRA DE CANAIS FUNCIONANDO (modo automático) */
+  #barraCanais {
+    position:fixed; bottom:90px; left:0; right:0; z-index:58;
+    display:flex; gap:10px; padding:12px 18px;
+    overflow-x:auto; overflow-y:hidden;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+    opacity:0; pointer-events:none;
+    transition: opacity 0.35s ease;
+    scrollbar-width:thin;
+  }
+  #barraCanais.visivel { opacity:1; pointer-events:auto; }
+  #barraCanais::-webkit-scrollbar { height:5px; }
+  #barraCanais::-webkit-scrollbar-thumb { background:#00b4ff; border-radius:5px; }
+  #barraCanais::-webkit-scrollbar-track { background:rgba(255,255,255,0.05); }
+
+  .chipCanal {
+    flex-shrink:0; min-width:110px;
+    background:rgba(20,30,45,0.9);
+    border:1px solid rgba(0,180,255,0.25);
+    border-radius:10px; padding:8px 12px;
+    cursor:pointer; transition: all 0.2s;
+    text-align:center;
+  }
+  .chipCanal:hover { background:rgba(0,180,255,0.2); border-color:#00b4ff; }
+  .chipCanal.ativo { background:#00b4ff; color:#000; border-color:#00b4ff; }
+  .chipCanal .nome {
+    font-size:11px; font-weight:bold;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    max-width:120px;
+  }
+  .chipCanal .status {
+    font-size:9px; opacity:0.8; margin-top:3px;
+  }
+  .chipCanal .status.ok { color:#4ade80; }
+  .chipCanal .status.off { color:#f87171; }
+  .chipCanal.ativo .status { color:#000; }
+
   /* CONTROLES PRINCIPAIS */
   #controles {
     position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
-    display:flex; gap:9px; z-index:60;
-    background:rgba(10,15,25,0.85); padding:10px 16px;
+    display:flex; gap:8px; z-index:60;
+    background:rgba(10,15,25,0.9); padding:10px 14px;
     border-radius:50px; opacity:0; pointer-events:none;
     transition: opacity 0.35s ease;
     border: 1px solid rgba(0,180,255,0.15);
@@ -89,8 +137,8 @@
   #controles.visivel { opacity:1; pointer-events:auto; }
   #controles button {
     background:rgba(255,255,255,0.08); color:#fff; border:none;
-    width:46px; height:46px; border-radius:50%;
-    font-size:17px; cursor:pointer;
+    width:44px; height:44px; border-radius:50%;
+    font-size:16px; cursor:pointer;
     display:flex; align-items:center; justify-content:center;
     transition: background 0.15s, transform 0.15s;
     flex-shrink:0;
@@ -100,20 +148,69 @@
   #controles button.destaque { background:rgba(255,80,80,0.25); border:1px solid rgba(255,80,80,0.5); }
   #controles button.destaque:hover { background:#ff5050; }
 
+  /* SELETOR DE FORMATO */
+  #seletorFormato {
+    position:fixed; bottom:22px; left:18px; z-index:61;
+    display:flex; flex-direction:column; gap:6px;
+    opacity:0; pointer-events:none;
+    transition: opacity 0.35s ease;
+  }
+  #seletorFormato.visivel { opacity:1; pointer-events:auto; }
+  #seletorFormato button {
+    background:rgba(20,30,45,0.9); color:#c0d0e0;
+    border:1px solid rgba(0,180,255,0.25);
+    padding:7px 12px; border-radius:7px;
+    font-size:11px; cursor:pointer; text-align:left;
+    transition: all 0.15s;
+  }
+  #seletorFormato button:hover { background:rgba(0,180,255,0.2); color:#fff; }
+  #seletorFormato button.ativo { background:#00b4ff; color:#000; border-color:#00b4ff; }
+
+  /* CONTROLE DE VOLUME */
+  #volumeBox {
+    position:fixed; bottom:22px; right:18px; z-index:61;
+    display:flex; align-items:center; gap:8px;
+    background:rgba(10,15,25,0.9); padding:8px 14px;
+    border-radius:30px; border:1px solid rgba(0,180,255,0.2);
+    opacity:0; pointer-events:none;
+    transition: opacity 0.35s ease;
+  }
+  #volumeBox.visivel { opacity:1; pointer-events:auto; }
+  #volumeBox .iconeVolume {
+    font-size:16px; cursor:pointer; user-select:none;
+    color:#00b4ff; flex-shrink:0;
+  }
+  #volumeSlider {
+    -webkit-appearance:none; appearance:none;
+    width:90px; height:4px; border-radius:2px;
+    background:rgba(255,255,255,0.2);
+    outline:none; cursor:pointer;
+  }
+  #volumeSlider::-webkit-slider-thumb {
+    -webkit-appearance:none; appearance:none;
+    width:14px; height:14px; border-radius:50%;
+    background:#00b4ff; cursor:pointer;
+    box-shadow:0 0 6px rgba(0,180,255,0.6);
+  }
+  #volumeSlider::-moz-range-thumb {
+    width:14px; height:14px; border-radius:50%;
+    background:#00b4ff; cursor:pointer; border:none;
+  }
+
   /* BOTÃO FLUTUANTE */
   #btnMostrar {
     position:fixed; bottom:22px; right:22px; z-index:55;
     background:rgba(0,180,255,0.15); color:#00b4ff;
     border:1px solid rgba(0,180,255,0.3);
-    width:46px; height:46px; border-radius:50%;
-    font-size:19px; cursor:pointer;
+    width:44px; height:44px; border-radius:50%;
+    font-size:18px; cursor:pointer;
     opacity:0.4; transition: opacity 0.3s, background 0.3s;
   }
   #btnMostrar:hover { opacity:1; background:rgba(0,180,255,0.3); }
 
   /* TOAST */
   #toast {
-    position:fixed; bottom:90px; left:50%; transform:translateX(-50%);
+    position:fixed; bottom:160px; left:50%; transform:translateX(-50%);
     background:rgba(0,180,255,0.92); color:#000; padding:9px 22px;
     border-radius:22px; font-size:13px; font-weight:bold;
     z-index:200; opacity:0; transition: opacity 0.3s;
@@ -166,6 +263,25 @@
   </div>
 </div>
 
+<!-- BARRA DE CANAIS FUNCIONANDO (modo automático) -->
+<div id="barraCanais"></div>
+
+<!-- SELETOR DE FORMATO -->
+<div id="seletorFormato">
+  <button data-formato="16-9" class="ativo">📺 16:9 (Padrão)</button>
+  <button data-formato="4-3">📻 4:3 (Clássico)</button>
+  <button data-formato="vertical">📱 Vertical (Reels)</button>
+  <button data-formato="cinema">🎬 Cinema (Preencher)</button>
+  <button data-formato="preencher">🖥️ Preencher tela</button>
+  <button data-formato="zoom">🔍 Zoom</button>
+</div>
+
+<!-- CONTROLE DE VOLUME -->
+<div id="volumeBox">
+  <span class="iconeVolume" id="iconeVolume">🔊</span>
+  <input type="range" id="volumeSlider" min="0" max="100" value="100">
+</div>
+
 <button id="btnMostrar" title="Mostrar controles">☰</button>
 
 <div id="controles">
@@ -186,7 +302,7 @@
 
 <script>
 /* ============================================================
-   CONFIGURAÇÕES E DADOS
+   CONFIGURAÇÕES
    ============================================================ */
 const URL_TV_NOVA_JUAREZ = "https://stmv2.webtvninjas.com.br/tvnovajuarez/tvnovajuarez/playlist.m3u8";
 const LOGO_TV_NOVA_JUAREZ = "https://i.postimg.cc/nhWqywPS/lv-0-20260616101447.png";
@@ -197,7 +313,6 @@ const canalTVNovaJuarez = {
   logo: LOGO_TV_NOVA_JUAREZ
 };
 
-// Lista base leve (só canais estáveis conhecidos)
 const canaisBaseInicial = [
   { nome: "Canal da Paraíba", url: URL_TV_NOVA_JUAREZ, logo: LOGO_TV_NOVA_JUAREZ },
   { nome: "TV Brasil", url: "https://stream.ads.ottera.tv/playlist.m3u8", logo: "" },
@@ -205,7 +320,6 @@ const canaisBaseInicial = [
   { nome: "TV Senado", url: "https://stream3.senado.leg.br/senado-tv/senado-tv.m3u8", logo: "" }
 ];
 
-// Listas públicas leves (curadas, sem carregar arquivos gigantes)
 const LISTAS_BUSCA = {
   regionais: "https://iptv-org.github.io/iptv/countries/br.m3u",
   anatel:    "https://iptv-org.github.io/iptv/categories/general.m3u",
@@ -213,25 +327,87 @@ const LISTAS_BUSCA = {
 };
 
 /* ============================================================
-   ESTADO GLOBAL
+   ESTADO
    ============================================================ */
 let listaCanais = [];
 let indiceAtual = 0;
 let hls = null;
 let timerEsconder = null;
 let timerTimeoutCanal = null;
-let tentativasReconexao = 0;
+let timerAutoHideBarra = null;
 const MAX_TENTATIVAS = 3;
-const TIMEOUT_CARREGAMENTO = 15000; // 15s para desistir de um canal
+const TIMEOUT_CARREGAMENTO = 15000;
 
 const video = document.getElementById("video");
 const controles = document.getElementById("controles");
 const headerInfo = document.getElementById("headerInfo");
 const botoesBusca = document.getElementById("botoesBusca");
+const barraCanais = document.getElementById("barraCanais");
+const seletorFormato = document.getElementById("seletorFormato");
+const volumeBox = document.getElementById("volumeBox");
 const overlayReconectando = document.getElementById("reconectando");
 
 /* ============================================================
-   MONTAR LISTA COM TV NOVA JUAREZ A CADA 5
+   VOLUME
+   ============================================================ */
+const volumeSlider = document.getElementById("volumeSlider");
+const iconeVolume = document.getElementById("iconeVolume");
+let volumeAnterior = 1;
+
+video.volume = 1;
+volumeSlider.value = 100;
+
+volumeSlider.addEventListener("input", (e) => {
+  const v = parseInt(e.target.value) / 100;
+  video.volume = v;
+  video.muted = (v === 0);
+  atualizarIconeVolume(v);
+});
+
+function atualizarIconeVolume(v) {
+  if (v === 0) iconeVolume.textContent = "🔇";
+  else if (v < 0.5) iconeVolume.textContent = "🔉";
+  else iconeVolume.textContent = "🔊";
+}
+
+iconeVolume.addEventListener("click", () => {
+  if (video.muted || video.volume === 0) {
+    video.muted = false;
+    video.volume = volumeAnterior || 1;
+    volumeSlider.value = video.volume * 100;
+    atualizarIconeVolume(video.volume);
+  } else {
+    volumeAnterior = video.volume;
+    video.muted = true;
+    video.volume = 0;
+    volumeSlider.value = 0;
+    atualizarIconeVolume(0);
+  }
+});
+
+/* ============================================================
+   FORMATOS DE TELA
+   ============================================================ */
+let formatoAtual = "16-9";
+document.querySelectorAll("#seletorFormato button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#seletorFormato button").forEach(b => b.classList.remove("ativo"));
+    btn.classList.add("ativo");
+    formatoAtual = btn.dataset.formato;
+    aplicarFormato(formatoAtual);
+    mostrarToast("Formato: " + btn.textContent.trim());
+    mostrarControles();
+  });
+});
+
+function aplicarFormato(f) {
+  video.className = "";
+  video.classList.add("formato-" + f);
+  video.style.transform = (f === "zoom") ? "scale(1.15)" : "none";
+}
+
+/* ============================================================
+   MONTAR LISTA
    ============================================================ */
 function montarListaFinal(canaisBase) {
   const lista = [];
@@ -263,7 +439,68 @@ function atualizarContador() {
 }
 
 /* ============================================================
-   LIMPEZA TOTAL DO PLAYER
+   BARRA DE CANAIS FUNCIONANDO (modo automático)
+   ============================================================ */
+function renderizarBarraCanais() {
+  barraCanais.innerHTML = "";
+  // Mostra até 30 canais para não pesar
+  const limite = Math.min(listaCanais.length, 30);
+  for (let i = 0; i < limite; i++) {
+    const canal = listaCanais[i];
+    const chip = document.createElement("div");
+    chip.className = "chipCanal" + (i === indiceAtual ? " ativo" : "");
+    chip.innerHTML = `
+      <div class="nome">${escapeHtml(canal.nome)}</div>
+      <div class="status ok">● funcionando</div>
+    `;
+    chip.addEventListener("click", () => {
+      tocarCanal(i);
+      mostrarControles();
+    });
+    barraCanais.appendChild(chip);
+  }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/* ============================================================
+   CONTROLES (AUTO-HIDE + barra de canais)
+   ============================================================ */
+function mostrarControles() {
+  controles.classList.add("visivel");
+  headerInfo.classList.add("visivel");
+  botoesBusca.classList.add("visivel");
+  seletorFormato.classList.add("visivel");
+  volumeBox.classList.add("visivel");
+  barraCanais.classList.add("visivel");
+
+  clearTimeout(timerEsconder);
+  timerEsconder = setTimeout(() => {
+    controles.classList.remove("visivel");
+    headerInfo.classList.remove("visivel");
+    botoesBusca.classList.remove("visivel");
+    seletorFormato.classList.remove("visivel");
+    volumeBox.classList.remove("visivel");
+    barraCanais.classList.remove("visivel");
+  }, 6000);
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+let toastTimer = null;
+function mostrarToast(msg) {
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.classList.add("visivel");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove("visivel"), 2500);
+}
+
+/* ============================================================
+   DESTRUIR PLAYER
    ============================================================ */
 function destruirPlayer() {
   if (hls) {
@@ -279,7 +516,7 @@ function destruirPlayer() {
 }
 
 /* ============================================================
-   TOCAR CANAL (com timeout e recuperação)
+   TOCAR CANAL
    ============================================================ */
 function tocarCanal(indice, tentativa = 0) {
   if (!listaCanais.length) return;
@@ -295,7 +532,11 @@ function tocarCanal(indice, tentativa = 0) {
   destruirPlayer();
   overlayReconectando.classList.remove("visivel");
 
-  // Timeout: se não começar a tocar em X segundos, tenta de novo ou pula
+  // Mantém volume atual
+  video.volume = parseInt(volumeSlider.value) / 100;
+  video.muted = (video.volume === 0);
+
+  // Timeout de carregamento
   clearTimeout(timerTimeoutCanal);
   timerTimeoutCanal = setTimeout(() => {
     if (video.readyState < 2) {
@@ -313,11 +554,14 @@ function tocarCanal(indice, tentativa = 0) {
     }
   }, TIMEOUT_CARREGAMENTO);
 
-  // Suporte nativo HLS (Safari / iOS / algumas TVs)
+  // Native HLS
   if (video.canPlayType("application/vnd.apple.mpegurl")) {
     video.src = canal.url;
     video.play().catch(() => {});
-    video.onloadeddata = () => { clearTimeout(timerTimeoutCanal); overlayReconectando.classList.remove("visivel"); };
+    video.onloadeddata = () => {
+      clearTimeout(timerTimeoutCanal);
+      overlayReconectando.classList.remove("visivel");
+    };
     video.onerror = () => {
       if (tentativa < MAX_TENTATIVAS) {
         overlayReconectando.classList.add("visivel");
@@ -338,7 +582,9 @@ function tocarCanal(indice, tentativa = 0) {
       maxMaxBufferLength: 40,
       enableWorker: true,
       lowLatencyMode: false,
-      backBufferLength: 10
+      backBufferLength: 10,
+      capLevelToPlayerSize: true,
+      startLevel: -1
     });
 
     hls.loadSource(canal.url);
@@ -352,20 +598,18 @@ function tocarCanal(indice, tentativa = 0) {
       if (!data.fatal) return;
 
       if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-        // Tenta recuperar rede
         if (tentativa < MAX_TENTATIVAS) {
           overlayReconectando.classList.add("visivel");
           setTimeout(() => tocarCanal(indice, tentativa + 1), 1500);
         } else {
           overlayReconectando.classList.remove("visivel");
-          mostrarToast("Sem conexão com o canal, pulando...");
+          mostrarToast("Sem conexão, pulando...");
           const prox = (indice + 1) % listaCanais.length;
           setTimeout(() => tocarCanal(prox, 0), 1500);
         }
       } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
         try { hls.recoverMediaError(); } catch (e) {}
       } else {
-        // Fatal irrecuperável → pula
         overlayReconectando.classList.remove("visivel");
         const prox = (indice + 1) % listaCanais.length;
         setTimeout(() => tocarCanal(prox, 0), 1500);
@@ -375,109 +619,67 @@ function tocarCanal(indice, tentativa = 0) {
     return;
   }
 
-  // Fallback
-  mostrarToast("Formato não suportado neste navegador");
-}
-
-/* ============================================================
-   CONTROLES (AUTO-HIDE)
-   ============================================================ */
-function mostrarControles() {
-  controles.classList.add("visivel");
-  headerInfo.classList.add("visivel");
-  botoesBusca.classList.add("visivel");
-  clearTimeout(timerEsconder);
-  timerEsconder = setTimeout(() => {
-    controles.classList.remove("visivel");
-    headerInfo.classList.remove("visivel");
-    botoesBusca.classList.remove("visivel");
-  }, 5000);
-}
-
-/* ============================================================
-   TOAST
-   ============================================================ */
-let toastTimer = null;
-function mostrarToast(msg) {
-  const toast = document.getElementById("toast");
-  toast.textContent = msg;
-  toast.classList.add("visivel");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove("visivel"), 2500);
+  mostrarToast("Formato não suportado");
 }
 
 /* ============================================================
    NAVEGAÇÃO
    ============================================================ */
 document.getElementById("btnAnterior").addEventListener("click", () => {
-  tentativasReconexao = 0;
   const novo = (indiceAtual - 1 + listaCanais.length) % listaCanais.length;
   tocarCanal(novo);
   mostrarControles();
 });
 
 document.getElementById("btnProximo").addEventListener("click", () => {
-  tentativasReconexao = 0;
   const novo = (indiceAtual + 1) % listaCanais.length;
   tocarCanal(novo);
   mostrarControles();
 });
 
 /* ============================================================
-   BOTÃO RECARREGAR CANAL (🔃)
+   RECARREGAR E REINICIAR
    ============================================================ */
 document.getElementById("btnRecarregar").addEventListener("click", () => {
   mostrarToast("Recarregando canal...");
-  tentativasReconexao = 0;
   tocarCanal(indiceAtual, 0);
   mostrarControles();
 });
 
-/* ============================================================
-   BOTÃO REINICIAR APP (⏻)
-   ============================================================ */
 document.getElementById("btnReiniciarApp").addEventListener("click", () => {
   mostrarToast("Reiniciando aplicativo...");
   destruirPlayer();
-  setTimeout(() => {
-    // Recarrega a página inteira, simulando reinício
-    location.reload();
-  }, 600);
+  setTimeout(() => location.reload(), 600);
 });
 
 /* ============================================================
-   TELA CHEIA
+   TELA CHEIA E GIRAR
    ============================================================ */
 document.getElementById("btnFullscreen").addEventListener("click", () => {
   try {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen?.();
-    } else {
-      document.exitFullscreen?.();
-    }
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+    else document.exitFullscreen?.();
   } catch (e) {}
   mostrarControles();
 });
 
-/* ============================================================
-   GIRAR TELA (leve, via CSS)
-   ============================================================ */
 let rotacionado = false;
 document.getElementById("btnGirar").addEventListener("click", () => {
   rotacionado = !rotacionado;
   video.style.transform = rotacionado ? "rotate(90deg) scale(1.8)" : "none";
+  mostrarToast(rotacionado ? "Tela girada" : "Tela normal");
   mostrarControles();
 });
 
 /* ============================================================
-   EVENTOS DE INTERAÇÃO
+   INTERAÇÃO
    ============================================================ */
 document.getElementById("btnMostrar").addEventListener("click", mostrarControles);
 video.addEventListener("click", mostrarControles);
 document.addEventListener("touchstart", mostrarControles, { passive: true });
 
 /* ============================================================
-   FETCH COM TIMEOUT (evita travamento)
+   FETCH COM TIMEOUT
    ============================================================ */
 async function fetchComTimeout(url, ms = 12000) {
   const controller = new AbortController();
@@ -493,14 +695,12 @@ async function fetchComTimeout(url, ms = 12000) {
 }
 
 /* ============================================================
-   PARSER M3U OTIMIZADO
+   PARSER M3U
    ============================================================ */
 function parsearM3U(texto, limite = 80) {
   const linhas = texto.split("\n");
   const canais = [];
-  let nomeAtual = "";
-  let logoAtual = "";
-  let grupoAtual = "";
+  let nomeAtual = "", logoAtual = "", grupoAtual = "";
 
   for (let i = 0; i < linhas.length; i++) {
     const linha = linhas[i].trim();
@@ -516,14 +716,14 @@ function parsearM3U(texto, limite = 80) {
     } else if (linha.startsWith("http") && nomeAtual) {
       canais.push({ nome: nomeAtual, url: linha, logo: logoAtual, grupo: grupoAtual });
       nomeAtual = ""; logoAtual = ""; grupoAtual = "";
-      if (canais.length >= limite) break; // limita para não travar
+      if (canais.length >= limite) break;
     }
   }
   return canais;
 }
 
 /* ============================================================
-   CACHE DE LISTAS (não baixa duas vezes)
+   CACHE
    ============================================================ */
 const cacheListas = {};
 
@@ -538,7 +738,7 @@ async function obterLista(url, limite = 80) {
 }
 
 /* ============================================================
-   AÇÕES DOS BOTÕES DE BUSCA
+   BUSCAS
    ============================================================ */
 async function buscarRegionais() {
   try {
@@ -553,10 +753,10 @@ async function buscarRegionais() {
       (c.grupo && c.grupo.toLowerCase().includes("paraíba"))
     );
     const usar = pb.length > 0 ? pb : canais.slice(0, 30);
-
     listaCanais = montarListaFinal(usar);
     indiceAtual = 0;
     tocarCanal(0);
+    renderizarBarraCanais();
     mostrarToast(`${listaCanais.length} canais regionais carregados`);
   } catch (e) {
     mostrarToast("Falha ao carregar regionais");
@@ -573,6 +773,7 @@ async function buscarAnatel() {
     listaCanais = montarListaFinal(canais.slice(0, 40));
     indiceAtual = 0;
     tocarCanal(0);
+    renderizarBarraCanais();
     mostrarToast(`${listaCanais.length} canais de TV aberta carregados`);
   } catch (e) {
     mostrarToast("Falha ao carregar TV aberta");
@@ -589,6 +790,7 @@ async function buscarInternet() {
     listaCanais = montarListaFinal(canais.slice(0, 30));
     indiceAtual = 0;
     tocarCanal(0);
+    renderizarBarraCanais();
     mostrarToast(`${listaCanais.length} canais internacionais carregados`);
   } catch (e) {
     mostrarToast("Falha ao carregar internacionais");
@@ -606,8 +808,11 @@ document.getElementById("btnInternet").addEventListener("click", buscarInternet)
 window.addEventListener("load", () => {
   listaCanais = montarListaFinal(canaisBaseInicial);
   indiceAtual = 0;
+  aplicarFormato("16-9");
+  atualizarIconeVolume(1);
   tocarCanal(0);
   atualizarContador();
+  renderizarBarraCanais();
 
   setTimeout(() => {
     const splash = document.getElementById("splash");
@@ -618,10 +823,7 @@ window.addEventListener("load", () => {
   setTimeout(mostrarControles, 400);
 });
 
-/* Limpa memória ao fechar */
-window.addEventListener("beforeunload", () => {
-  destruirPlayer();
-});
+window.addEventListener("beforeunload", () => destruirPlayer());
 </script>
 </body>
 </html>
